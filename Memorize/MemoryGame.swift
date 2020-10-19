@@ -9,9 +9,10 @@ import Foundation
 
 struct MemoryGame<CardContent> where CardContent : Equatable {
     var cards: Array<Card>
+    var score: Int = 0
     
     mutating func choose(card: Card) {
-        print("card chosen \(card)");
+//        print("card chosen \(card)");
         guard !card.isMatched, !card.isFaceUp else {
             return
         }
@@ -51,13 +52,22 @@ struct MemoryGame<CardContent> where CardContent : Equatable {
             let indexOfCard2 = cards.firstIndex(matching: faceUpUnmatchedCards[1])!
             cards[indexOfCard1].isMatched = true
             cards[indexOfCard2].isMatched = true
-            print("matched \(cards[indexOfCard1]) to \(cards[indexOfCard2])");
+            score += 2
+            print("matched \(cards[indexOfCard1]) to \(cards[indexOfCard2]), score is \(score)");
         }
     }
     
     mutating func flipCard(_ card:Card) {
         if let indexOfCard = cards.firstIndex(matching: card) {
             cards[indexOfCard].isFaceUp = !cards[indexOfCard].isFaceUp
+            if cards[indexOfCard].isFaceUp {
+                if cards[indexOfCard].hasBeenSeen {
+                    score -= 1
+                    print("score reduced by 1 for already-seen card, new score is \(score)");
+                } else {
+                    cards[indexOfCard].hasBeenSeen = true
+                }
+            }
         }
     }
     
@@ -74,6 +84,7 @@ struct MemoryGame<CardContent> where CardContent : Equatable {
     struct Card: Identifiable {
         var isFaceUp: Bool = false
         var isMatched: Bool = false
+        var hasBeenSeen: Bool = false
         var content: CardContent
         var id: Int
     }

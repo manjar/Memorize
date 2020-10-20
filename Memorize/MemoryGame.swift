@@ -47,27 +47,31 @@ struct MemoryGame<CardContent> where CardContent : Equatable {
     
     mutating func checkForPairAndMatch() {
         let faceUpUnmatchedCards = cards.filter { $0.isFaceUp == true && $0.isMatched == false }
+        guard faceUpUnmatchedCards.count == 2 else {
+            return
+        }
+        let indexOfCard1 = cards.firstIndex(matching: faceUpUnmatchedCards[0])!
+        let indexOfCard2 = cards.firstIndex(matching: faceUpUnmatchedCards[1])!
         if faceUpUnmatchedCards[0].content == faceUpUnmatchedCards[1].content {
-            let indexOfCard1 = cards.firstIndex(matching: faceUpUnmatchedCards[0])!
-            let indexOfCard2 = cards.firstIndex(matching: faceUpUnmatchedCards[1])!
             cards[indexOfCard1].isMatched = true
             cards[indexOfCard2].isMatched = true
             score += 2
             print("matched \(cards[indexOfCard1]) to \(cards[indexOfCard2]), score is \(score)");
+        } else {
+            if cards[indexOfCard1].hasBeenSeen {
+                score -= 1
+            }
+            if cards[indexOfCard2].hasBeenSeen {
+                score -= 1
+            }
         }
+        cards[indexOfCard1].hasBeenSeen = true
+        cards[indexOfCard2].hasBeenSeen = true
     }
     
     mutating func flipCard(_ card:Card) {
         if let indexOfCard = cards.firstIndex(matching: card) {
             cards[indexOfCard].isFaceUp = !cards[indexOfCard].isFaceUp
-            if cards[indexOfCard].isFaceUp {
-                if cards[indexOfCard].hasBeenSeen {
-                    score -= 1
-                    print("score reduced by 1 for already-seen card, new score is \(score)");
-                } else {
-                    cards[indexOfCard].hasBeenSeen = true
-                }
-            }
         }
     }
     

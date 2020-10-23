@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum EmojiMemoryGameThemeType: CaseIterable {
+enum EmojiMemoryGameThemeType: String, CaseIterable {
     case halloween
     case faces
     case sports
@@ -19,6 +19,7 @@ enum EmojiMemoryGameThemeType: CaseIterable {
 struct EmojiMemoryGameTheme {
     var emojis: Array<String> = ["👻","🦇","🧛🏻‍♂️","🎃","🕷","🕸","🙀","😱","🔥"]
     var themeColor: Color = Color.blue
+    var name: String
     
     var numberOfPairs: Int {
         get {
@@ -30,12 +31,15 @@ struct EmojiMemoryGameTheme {
         self.init(withThemeType: EmojiMemoryGameThemeType.flags)
     }
     
-    init(emojis: Array<String>, themeColor:Color) {
+    init(emojis: Array<String>, themeColor:Color, name: String) {
         self.emojis = emojis;
         self.themeColor = themeColor
+        self.name = name
     }
     
     init(withThemeType themeType: EmojiMemoryGameThemeType) {
+        name = themeType.rawValue.capitalized
+        print("name is \(name)")
         switch themeType {
         case .halloween:
             emojis = ["👻","🦇","🧛🏻‍♂️","🎃","🕷","🕸","🙀","😱","🔥"]
@@ -67,11 +71,13 @@ struct EmojiMemoryGameTheme {
 
 class EmojiMemoryGame : ObservableObject {
     @Published private var model: MemoryGame<String> = EmojiMemoryGame.createMemoryGame()
+    static var themeName: String = ""
     
     static func createMemoryGame() -> MemoryGame<String> {
         let allThemes = EmojiMemoryGameThemeType.allCases.shuffled()
         var theme = EmojiMemoryGameTheme(withThemeType:allThemes.first!)
         theme.emojis.shuffle()
+        themeName = theme.name
         return MemoryGame<String>(numberOfPairsOfCards: theme.numberOfPairs) { pairIndex in
             theme.emojis[pairIndex]
         }

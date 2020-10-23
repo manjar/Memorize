@@ -28,6 +28,7 @@ struct EmojiMemoryGameView: View {
             }
             .padding()
             .foregroundColor(Color.orange)
+            Text("Theme: \(EmojiMemoryGame.themeName)")
         }
     }
 }

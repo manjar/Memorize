@@ -73,7 +73,7 @@ class EmojiMemoryGame : ObservableObject {
     @Published private var model: MemoryGame<String> = EmojiMemoryGame.createMemoryGame()
     static var themeName: String = ""
     
-    static func createMemoryGame() -> MemoryGame<String> {
+    private static func createMemoryGame() -> MemoryGame<String> {
         let allThemes = EmojiMemoryGameThemeType.allCases.shuffled()
         var theme = EmojiMemoryGameTheme(withThemeType:allThemes.first!)
         theme.emojis.shuffle()

@@ -36,26 +36,33 @@ struct EmojiMemoryGameView: View {
 struct CardView: View {
     var card: MemoryGame<String>.Card
 
-    var body: some View {
+    @ViewBuilder var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                if (card.isFaceUp) {
-                    RoundedRectangle(cornerRadius: cornerRadius).stroke(lineWidth: lineWidth)
-                    RoundedRectangle(cornerRadius: cornerRadius).fill(Color.white)
-                    Text(card.content)
-                } else if !card.isMatched {
-                    RoundedRectangle(cornerRadius: cornerRadius).fill()
-                } else {
-                    EmptyView()
-                }
-            }
-            .font(Font.system(size: min(geometry.size.width, geometry.size.height) * fontScaleFactor))
+            body(for: geometry.size)
         }
     }
     
-    let cornerRadius: CGFloat = 10.0
-    let lineWidth: CGFloat = 3.0
-    let fontScaleFactor: CGFloat = 0.75
+    func body(for size:CGSize) -> some View {
+        ZStack {
+            if (card.isFaceUp) {
+                RoundedRectangle(cornerRadius: cornerRadius).stroke(lineWidth: lineWidth)
+                RoundedRectangle(cornerRadius: cornerRadius).fill(Color.white)
+                Text(card.content)
+            } else if !card.isMatched {
+                RoundedRectangle(cornerRadius: cornerRadius).fill()
+            } else {
+                EmptyView()
+            }
+        }
+        .font(Font.system(size: fontSize(for: size)))
+    }
+    
+    private let cornerRadius: CGFloat = 10.0
+    private let lineWidth: CGFloat = 3.0
+    private func fontSize(for size:CGSize) -> CGFloat {
+        24.0
+//        min(size.width, size.height) * 0.75
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {

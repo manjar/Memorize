@@ -27,7 +27,7 @@ struct EmojiMemoryGameView: View {
                     .padding(5.0)
             }
             .padding()
-            .foregroundColor(Color.orange)
+            .foregroundColor(EmojiMemoryGame.themeColor)
             Text("Theme: \(EmojiMemoryGame.themeName)")
         }
     }
@@ -42,31 +42,30 @@ struct CardView: View {
         }
     }
     
-    func body(for size:CGSize) -> some View {
-        ZStack {
-            if (card.isFaceUp) {
-                RoundedRectangle(cornerRadius: cornerRadius).stroke(lineWidth: lineWidth)
-                RoundedRectangle(cornerRadius: cornerRadius).fill(Color.white)
+    @ViewBuilder
+    private func body(for size:CGSize) -> some View {
+        if (card.isFaceUp || !card.isMatched) {
+            ZStack {
+                Pie(startAngle: Angle(degrees: 0.0 - 90.0), endAngle: Angle(degrees: 110 - 90.0), clockwise: true).padding(5.0).opacity(0.4)
                 Text(card.content)
-            } else if !card.isMatched {
-                RoundedRectangle(cornerRadius: cornerRadius).fill()
-            } else {
-                EmptyView()
-            }
+                    .font(Font.system(size: fontSize(for: size)))
+                    .rotationEffect(Angle(degrees: card.isMatched ? 360.0 : 0.0))
+                    .animation(card.isMatched ? Animation.linear(duration: 1.0).repeatForever(autoreverses: false) : .default)
+            }.cardify(isFaceUp: card.isFaceUp)
+        } else {
+            EmptyView()
         }
-        .font(Font.system(size: fontSize(for: size)))
     }
     
-    private let cornerRadius: CGFloat = 10.0
-    private let lineWidth: CGFloat = 3.0
     private func fontSize(for size:CGSize) -> CGFloat {
-        24.0
-//        min(size.width, size.height) * 0.75
+        min(size.width, size.height) * 0.7
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        EmojiMemoryGameView(viewModel: EmojiMemoryGame())
+        let game = EmojiMemoryGame()
+        game.choose(card: game.cards[0])
+        return EmojiMemoryGameView(viewModel: game)
     }
 }

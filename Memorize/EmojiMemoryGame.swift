@@ -72,12 +72,14 @@ struct EmojiMemoryGameTheme {
 class EmojiMemoryGame : ObservableObject {
     @Published private var model: MemoryGame<String> = EmojiMemoryGame.createMemoryGame()
     static var themeName: String = ""
+    static var themeColor: Color = Color.blue
     
     private static func createMemoryGame() -> MemoryGame<String> {
         let allThemes = EmojiMemoryGameThemeType.allCases.shuffled()
         var theme = EmojiMemoryGameTheme(withThemeType:allThemes.first!)
         theme.emojis.shuffle()
         themeName = theme.name
+        themeColor = theme.themeColor
         return MemoryGame<String>(numberOfPairsOfCards: theme.numberOfPairs) { pairIndex in
             theme.emojis[pairIndex]
         }

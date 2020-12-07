@@ -15,14 +15,27 @@ struct EmojiMemoryThemePicker: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(themes) { theme in
-                    EmojiThemeView(name: theme.name, emojis: theme.emojis, color: theme.color)
-                        .onTapGesture {
-                            selectedTheme = theme
-                            isBeingPresented = false
-                        }
+                ForEach(themes, id: \.self) { theme in
+                    NavigationLink(destination: EmojiMemoryThemeEditor(theme: $themes[themes.firstIndex(matching:theme)!])
+                                    .navigationBarTitle(theme.name)
+                    ) {
+                        EmojiThemeView(name: theme.name, emojis: theme.emojis, color: theme.color)
+                            .onTapGesture {
+                                selectedTheme = theme
+                                isBeingPresented = false
+                            }
+                    }
+                }.onDelete { (indexSetToDelete) in
+                    deleteThemes(indexSet: indexSetToDelete)
                 }
             }.navigationBarTitle("Memorize")
+            .navigationBarItems(trailing: EditButton())
+        }
+    }
+    
+    func deleteThemes(indexSet: IndexSet) {
+        indexSet.map { themes[$0] }.forEach { theme in
+            themes.remove(at: themes.firstIndex(matching: theme)!)
         }
     }
 }

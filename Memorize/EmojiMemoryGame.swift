@@ -7,86 +7,30 @@
 
 import SwiftUI
 
-enum EmojiMemoryGameThemeType: String, CaseIterable {
-    case halloween
-    case faces
-    case sports
-    case flags
-    case foods
-    case animals
-}
-
-struct EmojiMemoryGameTheme {
-    var emojis: Array<String> = ["👻","🦇","🧛🏻‍♂️","🎃","🕷","🕸","🙀","😱","🔥"]
-    var themeColor: Color = Color.blue
-    var name: String
-    
-    var numberOfPairs: Int {
-        get {
-            return emojis.count
-        }
-    }
-    
-    init() {
-        self.init(withThemeType: EmojiMemoryGameThemeType.flags)
-    }
-    
-    init(emojis: Array<String>, themeColor:Color, name: String) {
-        self.emojis = emojis;
-        self.themeColor = themeColor
-        self.name = name
-    }
-    
-    init(withThemeType themeType: EmojiMemoryGameThemeType) {
-        name = themeType.rawValue.capitalized
-        print("name is \(name)")
-        switch themeType {
-        case .halloween:
-            emojis = ["👻","🦇","🧛🏻‍♂️","🎃","🕷","🕸","🙀","😱","🔥"]
-            themeColor = Color.orange
-            break;
-        case .faces:
-            emojis = ["👩🏽‍🦰","👲🏿","🧛🏻‍♂️","👵🏾","🧑🏻‍🍳","👩🏽‍🌾","👩🏻‍💼"]
-            themeColor = Color.pink
-            break;
-        case .sports:
-            emojis = ["⚽️","🏀","🏈","⚾️","🥎","🏓","🎿","🏉","🥏"]
-            themeColor = Color.blue
-            break;
-        case .flags:
-            emojis = ["🇧🇮","🇧🇪","🇨🇻","🇨🇴","🇦🇹","🇧🇭","🇦🇶","🇦🇱","🇨🇬"]
-            themeColor = Color.gray
-            break;
-        case .foods:
-            emojis = ["🧀","🥬","🥐","🍖","🥨","🌮","🌽","🍩","🍤"]
-            themeColor = Color.green
-            break;
-        case .animals:
-            emojis = ["🐶","🐤","🐍","🦄","🐒","🦐","🐪","🦀","🦋"]
-            themeColor = Color.yellow
-            break;
-        }
-    }
-}
-
 class EmojiMemoryGame : ObservableObject {
-    @Published private var model: MemoryGame<String> = EmojiMemoryGame.createMemoryGame()
-    static var themeName: String = ""
-    static var themeColor: Color = Color.blue
+    var theme: EmojiMemoryGameTheme?
+    @Published private var model: MemoryGame<String>
     
-    private static func createMemoryGame() -> MemoryGame<String> {
-        let allThemes = EmojiMemoryGameThemeType.allCases.shuffled()
-        var theme = EmojiMemoryGameTheme(withThemeType:allThemes.first!)
-        theme.emojis.shuffle()
-        themeName = theme.name
-        themeColor = theme.themeColor
-        return MemoryGame<String>(numberOfPairsOfCards: theme.numberOfPairs) { pairIndex in
-            theme.emojis[pairIndex]
+    init(theme: EmojiMemoryGameTheme? = nil) {
+        self.theme = theme
+        if theme != nil {
+            model = EmojiMemoryGame.createMemoryGame(theme: theme)
+        } else {
+            model = EmojiMemoryGame.createMemoryGame()
         }
     }
     
-    func newMemoryGame() {
-        model = EmojiMemoryGame.createMemoryGame()
+    private static func createMemoryGame(theme: EmojiMemoryGameTheme? = nil) -> MemoryGame<String> {
+        var themeToUse = theme ?? EmojiMemoryGameTheme.randomTheme()
+        print("json representation is: \(themeToUse.json?.utf8 ?? "nil")")
+        themeToUse.emojis.shuffle()
+        return MemoryGame<String>(numberOfPairsOfCards: themeToUse.numberOfPairs) { pairIndex in
+            themeToUse.emojis[pairIndex]
+        }
+    }
+    
+    func newMemoryGame(theme: EmojiMemoryGameTheme? = nil) {
+        model = EmojiMemoryGame.createMemoryGame(theme: theme)
     }
     
     // MARK: -  Access to the model

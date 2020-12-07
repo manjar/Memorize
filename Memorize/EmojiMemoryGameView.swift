@@ -8,32 +8,53 @@
 import SwiftUI
 
 struct EmojiMemoryGameView: View {
-    @ObservedObject var viewModel: EmojiMemoryGame
+    @ObservedObject var gameViewModel: EmojiMemoryGame
+    @ObservedObject var themeModel: EmojiMemoryGameThemeViewModel
+    @State var themePickerShowing: Bool = false
     
     var body: some View {
         VStack {
-            Text("Score: \(viewModel.score)")
-            Grid(viewModel.cards) { card in
+            Text("Score: \(gameViewModel.score)")
+            Grid(gameViewModel.cards) { card in
                 CardView(card: card)
                     .onTapGesture() {
                         withAnimation(.linear) {
-                            viewModel.choose(card: card)
+                            gameViewModel.choose(card: card)
                         }
                     }
                     .aspectRatio(contentMode:.fit)
                     .padding(5.0)
             }
             .padding()
-            .foregroundColor(EmojiMemoryGame.themeColor)
+            .foregroundColor(themeModel.selectedTheme?.color ?? Color.clear)
             Button(action: {
                 withAnimation(.easeInOut) {
-                    viewModel.newMemoryGame()
+                    themeModel.newTheme()
+                    gameViewModel.newMemoryGame(theme: themeModel.selectedTheme)
                 }
             }, label: {
                 Text("New Game")
             })
-            Text("Theme: \(EmojiMemoryGame.themeName)")
+            HStack {
+                Text("Theme: \(themeModel.selectedTheme?.name ?? "")").padding()
+                Image(systemName: "pencil.circle.fill")
+            }
+            .onTapGesture {
+                themePickerShowing = true
+            }
+            .sheet(isPresented: $themePickerShowing, onDismiss: {
+                checkForChangeOfSelectedTheme()
+            }) {
+                EmojiMemoryThemePicker(themes: $themeModel.themes, selectedTheme: $themeModel.selectedTheme, isBeingPresented: $themePickerShowing)
+            }
         }.font(Font.system(size: 32))
+        .padding()
+    }
+    
+    func checkForChangeOfSelectedTheme() {
+        if (gameViewModel.theme != themeModel.selectedTheme) {
+            gameViewModel.newMemoryGame(theme: themeModel.selectedTheme)
+        }
     }
 }
 
@@ -87,8 +108,9 @@ struct CardView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        let game = EmojiMemoryGame()
-        game.choose(card: game.cards[0])
-        return EmojiMemoryGameView(viewModel: game)
+        let gameModel = EmojiMemoryGame()
+        let themeModel = EmojiMemoryGameThemeViewModel()
+        gameModel.choose(card: gameModel.cards[0])
+        return EmojiMemoryGameView(gameViewModel: gameModel, themeModel: themeModel)
     }
 }

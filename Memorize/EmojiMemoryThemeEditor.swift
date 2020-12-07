@@ -10,6 +10,7 @@ import SwiftUI
 struct EmojiMemoryThemeEditor: View {
     @Binding var theme: EmojiMemoryGameTheme
     @State private var emojisToAdd: String = ""
+    @State private var cardCount: Int = 0
     
     var body: some View {
         Form {
@@ -33,6 +34,14 @@ struct EmojiMemoryThemeEditor: View {
                 }
             }
             Section(header: Text("Card count")) {
+                HStack {
+                    Text("\(cardCount)")
+                    Stepper(onIncrement: {
+                        cardCount += 1
+                    }, onDecrement: {
+                        cardCount -= 1
+                    }, label: { EmptyView() })
+                }
             }
             Section(header: Text("Color")) {
                 Grid(EmojiMemoryGameThemeColor.allCases, id: \.self) { themeColor in
@@ -62,9 +71,3 @@ struct EmojiMemoreThemeEditorColorCell: View {
         }.aspectRatio(1.0, contentMode: .fit)
     }
 }
-
-//struct EmojiMemoryThemeEditor_Previews: PreviewProvider {
-//    static var previews: some View {
-//        EmojiMemoryThemeEditor()
-//    }
-//}

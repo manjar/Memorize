@@ -17,7 +17,7 @@ enum EmojiMemoryGameThemeType: String, CaseIterable, Codable {
     case animals
 }
 
-enum EmojiMemoryGameThemeColor: String, Codable {
+enum EmojiMemoryGameThemeColor: String, CaseIterable, Codable {
     case orange
     case pink
     case blue
@@ -29,10 +29,14 @@ enum EmojiMemoryGameThemeColor: String, Codable {
 struct EmojiMemoryGameTheme: Codable, Identifiable, Equatable, Hashable {
     var id: EmojiMemoryGameThemeType
     var emojis: Array<String> = ["👻","🦇","🧛🏻‍♂️","🎃","🕷","🕸","🙀","😱","🔥"]
-    private var themeColor: EmojiMemoryGameThemeColor = .blue
+    var themeColor: EmojiMemoryGameThemeColor = .blue
     var name: String
     
     var color: Color {
+        EmojiMemoryGameTheme.systemColor(for: themeColor)
+    }
+    
+    static func systemColor(for themeColor: EmojiMemoryGameThemeColor) -> Color {
         switch themeColor {
         case .orange:
             return Color.orange

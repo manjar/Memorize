@@ -8,20 +8,20 @@
 import SwiftUI
 
 struct EmojiMemoryThemePicker: View {
-    @Binding var themes: Array<EmojiMemoryGameTheme>
-    @Binding var selectedTheme: EmojiMemoryGameTheme?
+    @EnvironmentObject var themeModel: EmojiMemoryGameThemeViewModel
+    @State private var themeBeingEdited: EmojiMemoryGameTheme = EmojiMemoryGameTheme()
     @Binding var isBeingPresented: Bool
     
     var body: some View {
         NavigationView {
             List {
-                ForEach(themes, id: \.self) { theme in
-                    NavigationLink(destination: EmojiMemoryThemeEditor(theme: $themes[themes.firstIndex(matching:theme)!])
+                ForEach(themeModel.themes, id: \.self) { theme in
+                    NavigationLink(destination: EmojiMemoryThemeEditor(themeBeingEdited: theme)
                                     .navigationBarTitle(theme.name)
                     ) {
                         EmojiThemeView(name: theme.name, emojis: theme.emojis, color: theme.color)
                             .onTapGesture {
-                                selectedTheme = theme
+                                themeModel.selectedTheme = theme
                                 isBeingPresented = false
                             }
                     }
@@ -34,8 +34,8 @@ struct EmojiMemoryThemePicker: View {
     }
     
     func deleteThemes(indexSet: IndexSet) {
-        indexSet.map { themes[$0] }.forEach { theme in
-            themes.remove(at: themes.firstIndex(matching: theme)!)
+        indexSet.map { themeModel.themes[$0] }.forEach { theme in
+            themeModel.themes.remove(at: themeModel.themes.firstIndex(matching: theme)!)
         }
     }
 }

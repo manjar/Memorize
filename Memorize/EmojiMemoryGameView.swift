@@ -26,17 +26,17 @@ struct EmojiMemoryGameView: View {
                     .padding(5.0)
             }
             .padding()
-            .foregroundColor(themeModel.selectedTheme?.color ?? Color.clear)
+            .foregroundColor(themeModel.selectedTheme.color)
             Button(action: {
                 withAnimation(.easeInOut) {
-                    themeModel.newTheme()
+                    themeModel.switchToRandomTheme()
                     gameViewModel.newMemoryGame(theme: themeModel.selectedTheme)
                 }
             }, label: {
                 Text("New Game")
             })
             HStack {
-                Text("Theme: \(themeModel.selectedTheme?.name ?? "")").padding()
+                Text("Theme: \(themeModel.selectedTheme.name)").padding()
                 Image(systemName: "pencil.circle.fill")
             }
             .onTapGesture {
@@ -45,7 +45,8 @@ struct EmojiMemoryGameView: View {
             .sheet(isPresented: $themePickerShowing, onDismiss: {
                 checkForChangeOfSelectedTheme()
             }) {
-                EmojiMemoryThemePicker(themes: $themeModel.themes, selectedTheme: $themeModel.selectedTheme, isBeingPresented: $themePickerShowing)
+                EmojiMemoryThemePicker(isBeingPresented: $themePickerShowing)
+                    .environmentObject(themeModel)
             }
         }.font(Font.system(size: 32))
         .padding()

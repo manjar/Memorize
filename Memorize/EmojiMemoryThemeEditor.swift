@@ -8,28 +8,30 @@
 import SwiftUI
 
 struct EmojiMemoryThemeEditor: View {
-    @Binding var theme: EmojiMemoryGameTheme
+    @EnvironmentObject var themeModel: EmojiMemoryGameThemeViewModel
+    var themeBeingEdited: EmojiMemoryGameTheme
     @State private var emojisToAdd: String = ""
     @State private var cardCount: Int = 0
+    @State private var themeName: String = ""
     
     var body: some View {
         Form {
             Section {
-                TextField("Theme Name", text: $theme.name)
+                TextField("Theme Name", text: $themeName, onEditingChanged: { began in
+                    themeModel.updateTheme(themeBeingEdited, toName: themeName)
+                })
             }
             Section(header: Text("Add Emoji"), content: {
                 TextField("Add Emoji", text: $emojisToAdd, onEditingChanged: { began in
-                    for character in emojisToAdd {
-                        theme.emojis.append(String(character))
-                    }
+                    themeModel.updateTheme(themeBeingEdited, byAddingEmojis: emojisToAdd)
                     self.emojisToAdd = ""
                 })
             })
             Section(header: Text("Remove Emoji")) {
-                Grid(theme.emojis, id: \.self) { emoji in
+                Grid(themeModel.themeMatchingTheme(themeBeingEdited).emojis, id: \.self) { emoji in
                     Text(emoji)
                         .onTapGesture {
-                            theme.emojis.remove(at: theme.emojis.firstIndex(of: emoji)!)
+                            themeModel.updateTheme(themeBeingEdited, byRemovingEmoji:emoji)
                         }
                 }
             }
@@ -45,13 +47,16 @@ struct EmojiMemoryThemeEditor: View {
             }
             Section(header: Text("Color")) {
                 Grid(EmojiMemoryGameThemeColor.allCases, id: \.self) { themeColor in
-                    EmojiMemoreThemeEditorColorCell(color: EmojiMemoryGameTheme.systemColor(for: themeColor), isSelected: themeColor == theme.themeColor)
+                    EmojiMemoreThemeEditorColorCell(color: EmojiMemoryGameTheme.systemColor(for: themeColor), isSelected: themeColor == themeModel.themeMatchingTheme(themeBeingEdited).themeColor)
                         .onTapGesture {
-                            theme.themeColor = themeColor
+                            themeModel.updateTheme(themeBeingEdited, toThemeColor: themeColor)
                         }
                 }
             }
+        }.onAppear {
+            themeName = themeBeingEdited.name
         }
+        .navigationBarTitle(themeName)
     }
 }
 

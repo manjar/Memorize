@@ -24,6 +24,12 @@ class EmojiMemoryGameThemeViewModel: ObservableObject
 //        }
     }
     
+    func createNewTheme() {
+        let newTheme = EmojiMemoryGameTheme(withThemeType: .animals)
+        updateTheme(newTheme, toName: "New theme")
+        themes.append(newTheme)
+    }
+    
     func themeMatchingTheme(_ theme:EmojiMemoryGameTheme) -> EmojiMemoryGameTheme {
         themes[themes.firstIndex(matching: theme)!]
     }

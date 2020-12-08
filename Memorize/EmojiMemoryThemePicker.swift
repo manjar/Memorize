@@ -28,6 +28,9 @@ struct EmojiMemoryThemePicker: View {
                 }.onDelete { (indexSetToDelete) in
                     deleteThemes(indexSet: indexSetToDelete)
                 }
+                Button("New Theme") {
+                    themeModel.createNewTheme()
+                }
             }.navigationBarTitle("Memorize")
             .navigationBarItems(trailing: EditButton())
         }
